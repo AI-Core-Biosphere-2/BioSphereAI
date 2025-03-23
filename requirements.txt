@@ -11,3 +11,4 @@ matplotlib
 Pillow
 httpx
 python-multipart
+pyvista

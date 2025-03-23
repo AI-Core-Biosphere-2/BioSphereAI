@@ -8,6 +8,7 @@ import os
 import asyncio
 import uvicorn
 from pathlib import Path
+import logging
 
 # Import our custom modules
 from app.data_loader import DataLoader
@@ -15,6 +16,11 @@ from app.rag import RAGSystem
 from app.agents import AgentSystem
 from app.visualization import Visualizer
 from app.image_generator import ImageGenerator
+from app.visualization_3d import Biosphere3DVisualizer
+
+# Set up logging
+logging.basicConfig(level=logging.DEBUG)
+logger = logging.getLogger(__name__)
 
 # Create the app
 app = FastAPI(title="BioSphere 2 Explorer API")
@@ -28,16 +34,18 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# Set up static files directory for images
+# Set up static files directory for images and 3D models
 static_dir = Path("static")
 static_dir.mkdir(exist_ok=True)
-app.mount("/static", StaticFiles(directory="static"), name="static")
+(static_dir / "models").mkdir(exist_ok=True)  # Ensure models directory exists
+app.mount("/static", StaticFiles(directory=str(static_dir)), name="static")
 
 # Initialize components
 data_loader = DataLoader(data_dir="data/raw")
 agent_system = AgentSystem(data_loader)
 visualizer = Visualizer(data_loader)
 image_generator = ImageGenerator(image_dir="static/images")
+biosphere_3d = Biosphere3DVisualizer(model_dir="static/models", data_dir="data/raw")
 
 # Define request and response models
 class ChatRequest(BaseModel):
@@ -64,6 +72,13 @@ class ComparisonRequest(BaseModel):
 class ImageRequest(BaseModel):
     location: str
     feature: Optional[str] = None
+
+class EnvironmentUpdateRequest(BaseModel):
+    location: str
+    temperature: Optional[float] = None
+    humidity: Optional[float] = None
+    co2: Optional[float] = None
+    light: Optional[float] = None
 
 # Define API endpoints
 @app.get("/")
@@ -168,6 +183,36 @@ async def generate_environment_image(request: ImageRequest):
         return {"image": image_data}
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Error generating image: {str(e)}")
+
+@app.get("/api/3d/state/{location}")
+async def get_3d_state(location: str):
+    """Get initial 3D visualization state for a location"""
+    logger.debug(f"Getting initial 3D state for location: {location}")
+    state = biosphere_3d.get_initial_state(location)
+    if not state:
+        logger.error(f"Failed to get 3D state for location: {location}")
+        raise HTTPException(status_code=404, detail=f"3D model not found for location '{location}'")
+    logger.debug(f"Returning 3D state: {state}")
+    return state
+
+@app.post("/api/3d/update")
+async def update_3d_environment(request: EnvironmentUpdateRequest):
+    """Update environment parameters for 3D visualization"""
+    logger.debug(f"Updating 3D environment for location: {request.location}")
+    # Filter out None values
+    params = {k: v for k, v in request.dict().items() if k != 'location' and v is not None}
+    
+    if not params:
+        logger.error("No parameters provided for update")
+        raise HTTPException(status_code=400, detail="No parameters provided for update")
+        
+    state = biosphere_3d.update_environment(params, request.location)
+    if not state:
+        logger.error(f"Failed to update environment for location: {request.location}")
+        raise HTTPException(status_code=404, detail=f"3D model not found for location '{request.location}'")
+        
+    logger.debug(f"Returning updated state: {state}")
+    return state
 
 if __name__ == "__main__":
     uvicorn.run("main:app", host="0.0.0.0", port=8000, reload=True)
