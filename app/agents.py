@@ -14,8 +14,9 @@ class Agent:
         return f"""You are an expert on the BioSphere 2 {self.name} biome.
 {self.description}
 Answer questions about the {self.name} environment and its data.
-Always be helpful, concise, and scientific in your responses.
-If you don't know something, say so rather than making up information."""
+IMPORTANT: Always use the actual data provided in the context to answer questions. Never make up or guess values.
+If the data is not available in the context, say "I don't have enough data to answer that question" rather than making assumptions.
+Be precise and scientific in your responses."""
         
     def get_conversation_context(self):
         """Get formatted conversation history"""
@@ -45,6 +46,8 @@ If you don't know something, say so rather than making up information."""
         # Format the full prompt
         prompt = f"{system_prompt}\n\nRelevant Data:\n{context}\n\nConversation History:\n{conversation_context}\n\nUser: {user_message}\nAssistant:"
         
+        print(f"\nAgent Debug - Full prompt:\n{prompt}")
+        
         try:
             # Make request to Ollama API
             response = requests.post(
@@ -59,6 +62,8 @@ If you don't know something, say so rather than making up information."""
             if response.status_code == 200:
                 result = response.json()
                 answer = result.get('response', 'Sorry, I could not generate a response.')
+                
+                print(f"\nAgent Debug - Model response:\n{answer}")
                 
                 # Add to conversation history
                 self.conversation_history[-1]['assistant'] = answer

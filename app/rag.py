@@ -33,8 +33,11 @@ class RAGSystem:
         """Create documents from metadata and variable information"""
         documents = []
         
+        print("\nRAG Debug - Creating documents...")
+        
         # Add general location information
         for location in self.data_loader.get_locations():
+            print(f"\nRAG Debug - Processing location: {location}")
             doc = f"Location: {location}. "
             doc += f"Variables available: {', '.join(self.data_loader.get_variables(location))}. "
             
@@ -51,6 +54,7 @@ class RAGSystem:
             
             # Add variable-specific documents
             for variable in self.data_loader.get_variables(location):
+                print(f"RAG Debug - Processing variable: {variable}")
                 summary = self.data_loader.get_variable_summary(location, variable)
                 if summary:
                     for col, stats in summary.items():
@@ -73,6 +77,7 @@ class RAGSystem:
                             'type': 'variable_info'
                         })
         
+        print(f"\nRAG Debug - Total documents created: {len(documents)}")
         self.documents = documents
         
     def _create_index(self):
@@ -105,6 +110,8 @@ class RAGSystem:
         # Search FAISS index
         distances, indices = self.index.search(np.array(query_embedding).astype('float32'), top_k)
         
+        print(f"\nRAG Debug - Query distances: {distances[0]}")
+        
         # Retrieve matching documents
         results = []
         for idx in indices[0]:
@@ -124,4 +131,5 @@ class RAGSystem:
         # Extract context
         context = "\n".join([doc['content'] for doc in results])
         
+        print(f"\nRAG Debug - Final context:\n{context}")
         return context
