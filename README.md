@@ -9,8 +9,8 @@ This project implements a BioSphere 2 Explorer that integrates environmental dat
 - [Description](#description)
 - [Installation](#installation)
 - [Usage](#usage)
+- [Demo](#demo)
 - [Configuration](#configuration)
-- [License](#license)
 - [Acknowledgments](#acknowledgments)
 
 ## Description
@@ -34,6 +34,9 @@ This project is a Streamlit & FastAPI-based AI powered system for the "BioSphere
 - **Multi-User Collaboration & Cloud Hosting**: Developed multi agent network so that where multiple users/LLM Agents can interact in real time and work together to generate insights.
 
 - **Data Exploration and Visualization**: Offers comprehensive endpoints for accessing and visually representing location and variable data.
+
+## Demo
+[![Watch the video](https://img.youtube.com/vi/FOe84DqF_-M/maxresdefault.jpg)](https://youtu.be/FOe84DqF_-M)
 
 ## Installation
 
@@ -119,10 +122,6 @@ This project is a Streamlit & FastAPI-based AI powered system for the "BioSphere
 - **Real-time Environmental Simulation**: Enable predictive modeling and dynamic environment adjustments.
 - **User Customization Features**: Allow users to modify simulation parameters and explore personalized scenarios.
 - **Integration with IoT Sensors**: Connect with real-world biosphere sensors for live 3D data visualization.
-
-## License
-
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
 ## Acknowledgments
 
