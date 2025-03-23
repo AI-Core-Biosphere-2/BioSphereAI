@@ -1,4 +1,4 @@
-# BioSphereAI - Team Ryukendo (#46)
+# BioSphereAI - Team Ryukendo (#47)
 
 This project implements a BioSphere 2 Explorer that integrates environmental data analysis, AI-powered conversational agents (RAG), dynamic visualization tools (2D/3D), and automated image generation to enable interactive exploration and real-time simulation of ecological systems through a unified interface.
 
