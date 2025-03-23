@@ -1,0 +1,13 @@
+fastapi
+uvicorn
+pandas
+numpy
+plotly
+faiss-cpu
+sentence-transformers
+requests
+python-dotenv
+matplotlib
+Pillow
+httpx
+python-multipart
